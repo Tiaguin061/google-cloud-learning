@@ -1,113 +1,123 @@
-import Image from 'next/image'
+'use client';
+
+import axios from 'axios';
+import { Loader2 } from 'lucide-react';
+import { useState } from 'react';
+import { toast } from 'react-toastify';
+import { PageResult } from './api/documentai/route';
 
 export default function Home() {
+  const [processFileResult, setProcessFileResult] = useState<PageResult[] | null>(null);
+
+  const [loading, setLoading] = useState(false);
+
+  async function submitToProcessFile(file?: File | null) {
+    if (!file) {
+      return;
+    }
+
+    if (file?.type !== 'application/pdf') {
+      return toast.error('Apenas o formato [.PDF] é permitido');
+    }
+
+    setLoading(true);
+
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const response = await axios.post<{
+        error: {
+          type: string;
+          message: string;
+        } | null;
+        result: PageResult[] | null
+      }>('http://localhost:3000/api/documentai', formData);
+
+      if (response.data.error) {
+        return toast.error(response.data.error.message);
+      }
+
+      setProcessFileResult(response.data.result);
+
+      toast.success('Arquivo upado com sucesso');
+    } catch (error: any) {
+      console.log('error', error)
+    } finally {
+      setLoading(false);
+    }
+  }
+
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">src/app/page.tsx</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:h-auto lg:w-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{' '}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
+    <div className='max-w-3xl mx-auto flex flex-col gap-8 w-full'>
+      <div className="flex items-center max-w-3xl w-full">
+        <label className="flex items-center gap-2 justify-center cursor-pointer max-w-[200px] mx-auto w-full text-center relative bg-green-500 p-2 px-4 rounded-md transition-all hover:brightness-110" htmlFor='process-file'>
+          <input
+            type="file"
+            name="file"
+            id="process-file"
+            disabled={loading}
+            className="disabled:opacity-50 disabled:cursor-not-allowed absolute z-10 w-full h-full opacity-0 hidden cursor-pointer"
+            onChange={(e) => submitToProcessFile(e.target.files?.item(0))}
+          />
+          Upar arquivo
+          {loading && <Loader2 className='animate-spin' />}
+        </label>
+
+        <div className="">
+          <span className='font-bold text-lg'>Informações:</span>
+          <ul className="">
+            <li className="list-disc">
+              Apenas .PDF
+            </li>
+            <li className="list-disc">
+              Até 15 páginas
+            </li>
+          </ul>
         </div>
       </div>
 
-      <div className="relative flex place-items-center before:absolute before:h-[300px] before:w-[480px] before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-[240px] after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 before:lg:h-[360px] z-[-1]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className="mb-32 grid text-center lg:max-w-5xl lg:w-full lg:mb-0 lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Docs{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Learn{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Templates{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Explore the Next.js 13 playground.
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Deploy{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
+      {loading ? (
+        <div className='flex flex-col gap-2 items-center'>
+          <Loader2 className='animate-spin' />
+          <span className="">Carregando...</span>
+        </div>
+      ) : (
+        <div className="flex flex-col gap-6">
+          {processFileResult?.length && processFileResult?.map((page, index) => (
+            <div className='flex flex-col gap-1 bg-zinc-700 px-4 py-6 rounded-md relative' key={`${page}+${index}`}>
+              <div className="text-center flex items-center justify-center h-8 w-8 rounded-full bg-zinc-300 absolute -left-2 -top-4 text-lg">{page.pageNumber}</div>
+              {page.pageParagraphs.map(paragraph => (
+                <span key={`${paragraph}+${index}`}>
+                  {paragraph}
+                </span>
+              ))}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
   )
 }
+
+// authenticates the service account to be used in this context
+// const documentai = google.documentai('v1').projects.operations.get({
+//   name: '',
+// })
+
+
+// async function test() {
+//   try {
+//     const response = await axios.post('https://us-documentai.googleapis.com/v1/projects/670086991862/locations/us/processors/2213411578b89edb:process', {}, {
+//       headers: {
+//         Authorization: 'blabla'
+//       }
+//     });
+
+//     console.log(response.data);
+//   } catch (error) {
+//     console.log({ error: error.response.data })
+//   }
+// }
+
+// test();
