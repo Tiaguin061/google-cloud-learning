@@ -52,7 +52,7 @@ export const documentAiClient = new DocumentProcessorServiceClient({
   projectId: 'next-auth-404513',
 });
 
-const accessToken = `ya29.a0AfB_byBdc3i0NFzgiahNgzf2RZOOWj-aU63e-qIzDmT0oehYIg-uw2k42qkG9yI_xfs-Rm9zxZgqg3BAgpfFlAsm2cL1S9XB7WlVsFQRi3FugxFIQWnyzeohmYh5K6SAbltzDQULVzjqQ3nkFHpJ0ERKDb0EQ0LymPKqaCgYKAe4SARISFQHGX2MisGhi9VeGMU_M2BrRQbIXRQ0171`;
+const accessToken = process.env.GOOGLE_ACCESS_TOKEN ?? 'Configure your access token';
 
 export function extractSegmentsByText(text: string, textAnchor: ParagraphTextAnchor) {
   if (!textAnchor.textSegments || textAnchor.textSegments.length === 0) {
