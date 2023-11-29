@@ -1,10 +1,10 @@
 'use client';
 
+import { PageResult } from '@/app/api/documentai/types';
 import axios from 'axios';
 import { Loader2 } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
-import { PageResult } from '../../api/documentai/route';
 
 export function ProcessFile() {
   const [processFileResult, setProcessFileResult] = useState<PageResult[] | null>(null);
