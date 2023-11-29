@@ -1,4 +1,5 @@
 import { DocumentProcessorServiceClient } from '@google-cloud/documentai';
+import axios from 'axios';
 import { NextResponse } from 'next/server';
 
 export type ParagraphTextAnchor = {
@@ -32,6 +33,8 @@ export type DocumentTypeResponse = {
 export type ProcessDocumentProps = {
   file: File
   processName: string;
+  projectId: string;
+  locations: string;
 }
 
 export type PageResult = {
@@ -46,8 +49,10 @@ export interface ProcessDocumentResponse {
 
 export const documentAiClient = new DocumentProcessorServiceClient({
   apiEndpoint: 'documentai.googleapis.com',
-  projectId: 'next-auth-404513'
+  projectId: 'next-auth-404513',
 });
+
+const accessToken = `ya29.a0AfB_byBdc3i0NFzgiahNgzf2RZOOWj-aU63e-qIzDmT0oehYIg-uw2k42qkG9yI_xfs-Rm9zxZgqg3BAgpfFlAsm2cL1S9XB7WlVsFQRi3FugxFIQWnyzeohmYh5K6SAbltzDQULVzjqQ3nkFHpJ0ERKDb0EQ0LymPKqaCgYKAe4SARISFQHGX2MisGhi9VeGMU_M2BrRQbIXRQ0171`;
 
 export function extractSegmentsByText(text: string, textAnchor: ParagraphTextAnchor) {
   if (!textAnchor.textSegments || textAnchor.textSegments.length === 0) {
@@ -62,20 +67,35 @@ export function extractSegmentsByText(text: string, textAnchor: ParagraphTextAnc
 
 export async function processDocument({
   file,
-  processName
+  processName,
+  projectId,
+  locations,
 }: ProcessDocumentProps) {
   const fileBuffer = await file.arrayBuffer();
   const encodedImage = Buffer.from(fileBuffer).toString('base64');
 
-  const request = {
-    name: processName,
-    rawDocument: {
-      content: encodedImage,
-      mimeType: 'application/pdf',
-    },
-  };
+  // const request = {
+  //   name: `projects/${projectId}/locations/${locations}/processors/${processName}`,
+  //   rawDocument: {
+  //     content: encodedImage,
+  //     mimeType: 'application/pdf',
+  //   },
+  // };
 
-  const [result] = await documentAiClient.processDocument(request);
+  // const [result] = await documentAiClient.processDocument(request);
+
+  const response = await axios.post(`https://us-documentai.googleapis.com/v1/projects/${projectId}/locations/${locations}/processors/${processName}:process`, {
+    "rawDocument": {
+      "mimeType": "application/pdf",
+      "content": encodedImage
+    }
+  }, {
+    headers: {
+      Authorization: `Bearer ${accessToken}`
+    }
+  });
+
+  const result = response.data;
 
   const { document } = result as ProcessDocumentResponse;
 
@@ -143,7 +163,9 @@ export async function POST(request: Request) {
   try {
     const document = await processDocument({
       file,
-      processName: `projects/670086991862/locations/us/processors/2213411578b89edb`,
+      processName: `2213411578b89edb`,
+      projectId: `670086991862`,
+      locations: `us`,
     });
 
     const pages = getPagesWithParagraphs(document);
@@ -153,6 +175,7 @@ export async function POST(request: Request) {
       result: pages,
     });
   } catch (error: any) {
+    console.log(error.response.data)
     return NextResponse.json({
       error: {
         type: 'File',
