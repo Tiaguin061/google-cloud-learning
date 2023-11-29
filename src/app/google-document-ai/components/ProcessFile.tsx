@@ -32,7 +32,7 @@ export function ProcessFile() {
           message: string;
         } | null;
         result: PageResult[] | null
-      }>('http://localhost:3000/api/documentai', formData);
+      }>('/api/documentai', formData);
 
 
       if (response.data.error) {
