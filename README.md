@@ -26,7 +26,11 @@ yarn dev
 Abra [http://localhost:3000](http://localhost:3000) em seu navegador.
 
 ## Document AI
-- Entrei no console da Google cloud, configurei a conta e criei um processador da Document AI e então retornou as informações iniciais para iniciar a implementação da API.
+- Entrei no console da Google cloud, configurei a conta e também criei chave de acesso para conta de serviço no IAM da Cloud e me retornou um JSON: 
+  - Na hora de criar uma nova chave diz: **"É feito o download de um arquivo contendo a chave privada. Armazene o arquivo com segurança porque essa chave não pode ser recuperada em caso de perda."** 
+  - Mas não utilizei, então fiquei em dúvida de onde utilizar esses dados.
+
+- Criei um processador da Document AI e então retornou as informações iniciais para iniciar a implementação da API.
 
 - Na visão geral tem o link para a **[documentação da implementação da API](https://cloud.google.com/document-ai/docs/process-documents-ocr)**.
 
