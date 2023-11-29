@@ -39,6 +39,7 @@ Abra [http://localhost:3000](http://localhost:3000) em seu navegador.
 
 - Após isso, consegui utilizar a API REST, pois instalei o gCloud CLI na minha máquina e executei o comando **[gcloud auth application-default print-access-token](https://cloud.google.com/document-ai/docs/setup#auth-test)** para pegar o Token de Acesso e então configurei no Authorization da requisição.
   - Para mim, está foi a parte mais díficil, pois eu fiquei um tempo tentando executar via REST, e só depois de usar a CLI eu consegui, então teoricamente eu estou limitado a usar o sistema apenas na minha máquina? **[link explicando autenticação usando gcloud](https://cloud.google.com/docs/authentication/rest?hl=pt-br#powershell)**
+  - Me parece que o Access Token muda toda hora, então mantive a implementação usando a biblioteca NPM até entender isso.
 
 - Estou tentando entender o porque na documentação diz os **[tipos de arquivos que a API aceita](https://cloud.google.com/document-ai/docs/file-types#file_types)**, mas quando implementei, consegui apenas com .PDF, então limitei ao sistema só aceitar .PDF.
 
