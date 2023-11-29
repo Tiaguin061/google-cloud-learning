@@ -1,36 +1,41 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+## Sobre
+Este projeto é para concentrar o aprendizado da Google Cloud.
 
-## Getting Started
+- Next Auth para Login com Google e outros;
+- [Google Document AI para extrair informações de documento](#document-ai);
 
-First, run the development server:
+## Iniciar
+
+- Para instalar as dependências do projeto:
+```bash
+npm install
+# or
+yarn --no-lockfile
+```
+
+- Clone **.env.example** e troque o nome para **.env** e configure as variaveis ambientes;
+
+- Para iniciar o projeto em localhost:
 
 ```bash
 npm run dev
 # or
 yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Abra [http://localhost:3000](http://localhost:3000) em seu navegador.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Document AI
+- Entrei no console da Google cloud, configurei a conta e criei um processador da Document AI e então retornou as informações iniciais para iniciar a implementação da API.
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+- Na visão geral tem o link para a **[documentação da implementação da API](https://cloud.google.com/document-ai/docs/process-documents-ocr)**.
 
-## Learn More
+- Quando tentei implementar via API REST, retornava erro de oAuth na chamada à API, e então passei a utilizar a **[Google-Cloud document ai da NPM](https://www.npmjs.com/package/@google-cloud/documentai)** e consegui implementar para upar arquivo .PDF e retornar os dados do documento.
+  - Inclusive, vendo alguns vídeos de documentação, na qual mostra em Python, eu pude perceber que utiliza de uma biblioteca, talvez não é seja muito usado a API REST neste caso?
 
-To learn more about Next.js, take a look at the following resources:
+- Após isso, consegui utilizar a API REST, pois instalei o gCloud CLI na minha máquina e executei o comando **[gcloud auth application-default print-access-token](https://cloud.google.com/document-ai/docs/setup#auth-test)** para pegar o Token de Acesso e então configurei no Authorization da requisição.
+  - Para mim, está foi a parte mais díficil, pois eu fiquei um tempo tentando executar via REST, e só depois de usar a CLI eu consegui, então teoricamente eu estou limitado a usar o sistema apenas na minha máquina? **[link explicando autenticação usando gcloud](https://cloud.google.com/docs/authentication/rest?hl=pt-br#powershell)**
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- Estou tentando entender o porque na documentação diz os **[tipos de arquivos que a API aceita](https://cloud.google.com/document-ai/docs/file-types#file_types)**, mas quando implementei, consegui apenas com .PDF, então limitei ao sistema só aceitar .PDF.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+- Criei uma página google-document-ai para exibir um Input para o usuário upar o arquivo e abaixo exibir os dados do arquivo upado. Nesta página, utilizei da estrutura de API o NextJS, então fiz toda a lógica de enviar para o Google Document AI lá, deixando a parte do cliente apenas para o consumo da própria API.
